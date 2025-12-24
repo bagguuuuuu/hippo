@@ -1,0 +1,372 @@
+:root {
+    --heart-size: 250px;
+    --eye-size: calc(var(--heart-size) * 0.2);
+    --pupil-base-size: calc(var(--eye-size) * 0.4);
+    --pupil-dilation-factor: 1;
+    --current-pupil-size: calc(var(--pupil-base-size) * var(--pupil-dilation-factor));
+    
+    --mouse-x: 0px;
+    --mouse-y: 0px;
+
+    --heart-center-x: 0px;
+    --heart-center-y: 0px;
+
+    --mouse-proximity-to-heart: 0;
+    
+    --heart-base-color: #ff4757;
+    --heart-highlight: #ff6b81;
+    --heart-shadow: #ff1f35;
+    --eye-color: #fff;
+    --pupil-color: #2c3e50;
+    --glow-color: #ff69b4;
+    --bg-color: #f8e9f2;
+}
+
+body {
+    background: radial-gradient(circle, var(--bg-color), #e8d0e0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    transition: background 0.5s ease;
+}
+
+.scene {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    perspective: 800px;
+}
+
+.heart-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--heart-size);
+    height: var(--heart-size);
+    transform-style: preserve-3d;
+    transform: translate(-50%, -50%) rotateY(0deg);
+    
+    --heartbeat-scale-factor: calc(1 + 0.08 * var(--mouse-proximity-to-heart));
+    animation: heartbeat 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    
+    filter: drop-shadow(0 0 calc(20px * var(--mouse-proximity-to-heart)) var(--glow-color));
+    transition: filter 0.3s ease-out, transform 0.5s ease;
+    will-change: transform;
+}
+
+@keyframes heartbeat {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(var(--heartbeat-scale-factor));
+    }
+    10% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 0.98));
+    }
+    13% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 0.94));
+    }
+    16% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 0.92));
+    }
+    25% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 1.05));
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 1.08));
+    }
+    35% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 1.04));
+    }
+    45% {
+        transform: translate(-50%, -50%) scale(calc(var(--heartbeat-scale-factor) * 0.98));
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(var(--heartbeat-scale-factor));
+    }
+}
+
+.heart {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--heart-highlight) 0%, var(--heart-base-color) 50%, var(--heart-shadow) 100%);
+    transform: rotate(-45deg);
+    box-shadow: -10px 10px 30px rgba(0, 0, 0, 0.2),
+                inset -5px 5px 25px rgba(255, 255, 255, 0.4),
+                inset 5px -5px 25px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    transition: background 0.3s ease;
+}
+
+.heart::before,
+.heart::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.heart::before {
+    top: -50%;
+    left: 0;
+    box-shadow: inset -5px 5px 15px rgba(255, 255, 255, 0.3),
+                inset 5px -5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.heart::after {
+    top: 0;
+    left: 50%;
+    box-shadow: inset -5px 5px 15px rgba(255, 255, 255, 0.3),
+                inset 5px -5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pulse-wave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--heart-size);
+    height: var(--heart-size);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: radial-gradient(circle, rgba(255, 105, 180, 0.5) 0%, rgba(255, 105, 180, 0) 70%);
+    opacity: calc(0.8 * var(--mouse-proximity-to-heart));
+    animation: pulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    pointer-events: none;
+}
+
+.pulse-wave:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.pulse-wave:nth-child(3) {
+    animation-delay: 1s;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: calc(0.8 * var(--mouse-proximity-to-heart));
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}
+
+.eyes-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+.eye {
+    position: absolute;
+    width: var(--eye-size);
+    height: var(--eye-size);
+    background: radial-gradient(circle at 40% 40%, var(--eye-color) 0%, #f0f0f0 100%);
+    border-radius: 50%;
+    box-shadow: inset 0 0 calc(var(--eye-size) * 0.15) rgba(0,0,0,0.3),
+                0 0 calc(var(--eye-size) * 0.1) rgba(0,0,0,0.2);
+    overflow: hidden;
+    animation: blink 6s infinite cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    animation-delay: var(--blink-delay, 0s);
+}
+
+@keyframes blink {
+    0%, 95%, 97.5%, 100% { transform: scaleY(1) translate(-50%, -50%); }
+    96%, 97% { transform: scaleY(0.1) translate(-50%, -50%); }
+}
+
+.eye.left {
+    top: calc(var(--heart-size) * 0.35);
+    left: calc(var(--heart-size) * 0.22);
+    transform: translate(-50%, -50%);
+    --blink-delay: 0.35s;
+}
+
+.eye.right {
+    top: calc(var(--heart-size) * 0.35);
+    left: calc(var(--heart-size) * 0.78);
+    transform: translate(-50%, -50%);
+    --blink-delay: 0s;
+}
+
+.pupil {
+    position: absolute;
+    width: var(--current-pupil-size);
+    height: var(--current-pupil-size);
+    background: radial-gradient(circle at 30% 30%, var(--pupil-color) 0%, #1a2530 100%);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    
+    --pupil-travel-distance: calc((var(--eye-size) - var(--current-pupil-size)) / 2 * 0.9);
+    
+    --dx: calc(var(--mouse-x) - var(--eye-center-x, 0px));
+    --dy: calc(var(--mouse-y) - var(--eye-center-y, 0px));
+    --angle-to-mouse: atan2(var(--dy), var(--dx));
+    
+    --pupil-offset-x: calc(cos(var(--angle-to-mouse)) * var(--pupil-travel-distance));
+    --pupil-offset-y: calc(sin(var(--angle-to-mouse)) * var(--pupil-travel-distance));
+
+    transform: translate(-50%, -50%) translate(var(--pupil-offset-x), var(--pupil-offset-y));
+    transition: transform 0.08s linear, width 0.2s ease-out, height 0.2s ease-out;
+}
+
+.pupil::after {
+    content: '';
+    position: absolute;
+    width: 35%;
+    height: 35%;
+    background-color: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    top: 20%;
+    left: 20%;
+    transition: opacity 0.2s ease-out;
+    opacity: var(--pupil-dilation-factor) > 1.2 ? 0.7 : 1;
+}
+
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: calc(0.2 + 0.8 * var(--mouse-proximity-to-heart));
+    transition: opacity 0.5s ease;
+}
+
+.particle {
+    position: absolute;
+    background-color: var(--glow-color);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes float-up {
+    0% {
+        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+        opacity: 0.8;
+        width: 10px;
+        height: 10px;
+    }
+    100% {
+        transform: translate(-50%, -50%) translateY(-100px) rotate(360deg);
+        opacity: 0;
+        width: 2px;
+        height: 2px;
+    }
+}
+
+.color-switcher {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 100;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.active {
+    border: 2px solid white;
+}
+
+.color-red {
+    background: linear-gradient(135deg, #ff6b81 0%, #ff4757 50%, #ff1f35 100%);
+}
+
+.color-purple {
+    background: linear-gradient(135deg, #d68aff 0%, #a742ff 50%, #8c00ff 100%);
+}
+
+.color-blue {
+    background: linear-gradient(135deg, #58c7ff 0%, #3498db 50%, #2980b9 100%);
+}
+
+.color-green {
+    background: linear-gradient(135deg, #7bed9f 0%, #2ed573 50%, #10ac54 100%);
+}
+
+.message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px 25px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--heart-base-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    opacity: 0;
+    z-index: 20;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.message.show {
+    opacity: 1;
+    animation: message-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes message-bounce {
+    0% { transform: translate(-50%, -50%) scale(0.5); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.float-heart {
+    position: absolute;
+    font-size: 20px;
+    /* color is set by JS */
+    pointer-events: none;
+    animation: float-heart 2s ease-out forwards;
+    /* text-shadow is set by JS */
+    z-index: 5;
+}
+
+@keyframes float-heart {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+    }
+    20% {
+        transform: translate(calc(-50% + (var(--random-x) * 30px)),
+                             calc(-50% + (var(--random-y) * -40px)))
+                           scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + (var(--random-x) * 100px)),
+                             calc(-50% + (var(--random-y) * -150px)))
+                           scale(1.5)
+                           rotate(calc(var(--random-r) * 360deg));
+        opacity: 0;
+    }
+}
